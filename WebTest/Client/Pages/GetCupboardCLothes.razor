@@ -1,0 +1,58 @@
+﻿@page "/cupboardClothes"
+@using DAL.Repositories.Interfaces
+@using DAL.Models.ForCupboardClothes.Response
+@inject ICupboardClothesRepository CupboardClothesRepository
+@inject NavigationManager NavigationManager
+
+<h3>GetCupboardCLothes</h3>
+
+
+@if (clothesList == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>CupboardId</th>
+            <th>ClothesId</th>
+            <th> Quantity</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var clothes in clothesList)
+        {
+            <tr>
+                <td>@clothes.Id</td>
+                <td>@clothes.CupboardId</td>
+                <td>@clothes.ClothesId</td>
+                <td>@clothes.Quantity</td>
+
+
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+
+
+
+
+
+@code {
+
+    private List<GetCupboardClothes> clothesList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        clothesList = await CupboardClothesRepository.GetAsync();
+    }
+
+}

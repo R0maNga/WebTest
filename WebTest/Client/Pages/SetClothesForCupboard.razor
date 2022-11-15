@@ -1,0 +1,80 @@
+﻿@page "/set-clothes"
+@using DAL.Repositories.Interfaces
+@using AutoMapper
+@using DAL.Models.ForCupboards.Response
+@using DAL.Models.ForCupboardClothes.Request
+@inject ICupboardClothesRepository CupboardClothesRepository
+@inject IClothesRepository ClothesRepository
+@inject ICupboardRepository CupboardRepository
+@inject IMapper _mapper
+@inject NavigationManager NavigationManager
+
+
+<h3>SetClothesForCupboard</h3>
+
+<div>
+
+
+    <EditForm Model="cupboardClothes" OnSubmit="HandleSubmit">
+        <div>
+
+            <label>Clothes</label><br />
+
+            <InputSelect @bind-Value="cupboardClothes.ClothesId" class="form-select">
+
+                @foreach (var item in clothes)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+
+            </InputSelect>
+
+        </div>
+        <div>
+            <label>Cupboard</label><br />
+
+            <InputSelect @bind-Value="cupboardClothes.CupboardId" class="form-select">
+
+                @foreach (var item in cupboard)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+
+            </InputSelect>
+        </div>
+        <div>
+            <label for="quantity">quantity</label>
+            <InputNumber id="quantity" min="0" @bind-Value="cupboardClothes.Quantity" class="form-control"></InputNumber>
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Add clothes</button>
+
+
+    </EditForm>
+
+
+</div>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        cupboard = await CupboardRepository.GetAsync();
+        clothes = await ClothesRepository.GetAsync();
+        cupboardClothes.ClothesId = clothes[0].Id;
+        cupboardClothes.CupboardId = cupboard[0].Id;
+    }
+
+    List<GetCupboard> cupboard = new();
+    List<DAL.Models.ForClothes.Response.GetClothes> clothes = new();
+    readonly CreateCupboardClothes cupboardClothes = new();
+
+
+    async Task HandleSubmit()
+    {
+        await CupboardClothesRepository.Create(cupboardClothes);
+        NavigationManager.NavigateTo("/cupboardClothes");
+    }
+
+}

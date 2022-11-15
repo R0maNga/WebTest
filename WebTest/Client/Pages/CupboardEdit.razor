@@ -1,0 +1,126 @@
+﻿@page "/for-cupboard"
+@page "/for-cupboard/{id:guid}"
+@using DAL.Repositories.Interfaces
+@using AutoMapper
+@using DAL.Models.ForCupboards.Response
+@using DAL.Models.ForCupboardModels.Response
+@using DAL.Models.ForCupboards.Request
+@using DAL.Models.Additional
+@inject ICupboardModelRepository ICupboardModelRepository
+@inject IMapper _mapper
+@inject ICupboardRepository ICupboardRepository
+@inject NavigationManager NavigationManager
+
+@if (Id == null)
+{
+    <PageTitle>
+        Create a new Cupboard
+    </PageTitle>
+}
+else
+{
+    <PageTitle>Edit @cupboard.Name</PageTitle>
+    <h3>Edit @cupboard.Name</h3>
+}
+
+
+<EditForm Model="cupboard" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" required @bind-Value="cupboard.Name" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="owner">Owner</label>
+        <InputText id="owner" required @bind-Value="cupboard.OwnerName" class="form-control"></InputText>
+    </div>
+    <div>
+        <label>Model</label><br/>
+
+        <InputSelect @bind-Value="cupboard.ModelId" class="form-select">
+            @foreach (var item in cupboardModels)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+
+        </InputSelect>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal">Delete UWU Cupboard </button>
+
+
+</EditForm>
+
+
+<div class="modal fade" data-backdrop="false" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal Confirm</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Wanna delete cupboard?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger" @onclick="DeleteCupboard">Delete Cupboard </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Add new Cupboard" : "Update cupboard";
+
+        cupboardModels = await ICupboardModelRepository.GetAsync();
+        await ICupboardModelRepository.GetAsync();
+    }
+
+    GetCupboardById cupboard = new();
+    List<GetCupboardModel> cupboardModels = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+            cupboardModels = await ICupboardModelRepository.GetAsync();
+            cupboard.CupboardModel = _mapper.Map<ModelAdditional>(cupboardModels[0]);
+            cupboard.ModelId = cupboard.CupboardModel.Id;
+        }
+        else
+        {
+            cupboard = await ICupboardRepository.GetByIdAsync((Guid)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await ICupboardRepository.Create(_mapper.Map<CreateCupboard>(cupboard));
+        }
+        else
+        {
+            await ICupboardRepository.Update(_mapper.Map<UpdateCupboard>(cupboard));
+        }
+    }
+
+    async Task DeleteCupboard()
+    {
+        await ICupboardRepository.Delete(_mapper.Map<DeleteCupboard>(cupboard));
+    }
+
+
+
+}

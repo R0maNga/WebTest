@@ -1,9 +1,23 @@
 ﻿@page "/"
+@using DAL.Repositories.Interfaces
+@inject IProcedureRepository ProcedureRepository
+@inject NavigationManager NavigationManager
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Welcome to Cupboard application!</h1>
+<h2>Its simple Application for test project</h2>
+<p style="text-align: center">
+    <button class="btn btn-primary" @onclick="CallProcedure">Call stored procedure</button>
+</p>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code{
+
+    async Task CallProcedure()
+    {
+        await ProcedureRepository.CallProcedure();
+        NavigationManager.NavigateTo("/cupboardClothes");
+    }
+
+}

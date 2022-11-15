@@ -1,15 +1,15 @@
-﻿@page "/cupboard"
+﻿@page "/clothes"
 @using DAL.Repositories.Interfaces
-@using DAL.Models.ForCupboards.Response
 
-@inject ICupboardRepository CupboardRepository
+
+@inject IClothesRepository ClothesRepository
 @inject NavigationManager NavigationManager
 
-<div></div>
-<h1>Cupboard data</h1>
+
+<h1>Clothes data</h1>
 
 
-@if (cupboards == null)
+@if (clothesList == null)
 {
     <p>
         <em>Loading...</em>
@@ -22,20 +22,20 @@ else
         <tr>
             <th>Id</th>
             <th>Name</th>
-            <th>Owner Name</th>
-            <th>Cupboard Model</th>
+            <th>Default Quantity</th>
+
         </tr>
         </thead>
         <tbody>
-        @foreach (var cupboard in cupboards)
+
+        @foreach (var clothes in clothesList)
         {
             <tr>
-                <td>@cupboard.Id</td>
-                <td>@cupboard.Name</td>
-                <td>@cupboard.OwnerName</td>
-                <td>@cupboard.CupboardModel.Name</td>
+                <td>@clothes.Id</td>
+                <td>@clothes.Name</td>
+                <td>@clothes.DefaultQuantity</td>
                 <td>
-                    <button class="btn btn-primary" @onclick="() => ShowCupboard(cupboard.Id)">
+                    <button class="btn btn-primary" @onclick="() => ShowCupboard(clothes.Id)">
                         <i class="oi oi-pencil"></i>
                     </button>
                 </td>
@@ -57,22 +57,23 @@ else
 }
 
 @code {
-    private List<GetCupboard> cupboards;
+    private List<DAL.Models.ForClothes.Response.GetClothes> clothesList;
 
 
     protected override async Task OnInitializedAsync()
     {
-        cupboards = await CupboardRepository.GetAsync();
+        clothesList = await ClothesRepository.GetAsync();
     }
+
 
     void ShowCupboard(Guid id)
     {
-        NavigationManager.NavigateTo($"for-cupboard/{id}");
+        NavigationManager.NavigateTo($"for-clothes/{id}");
     }
 
     void Createcupboard()
     {
-        NavigationManager.NavigateTo("for-cupboard");
+        NavigationManager.NavigateTo("for-clothes");
     }
 
 }
